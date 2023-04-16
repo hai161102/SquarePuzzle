@@ -1,0 +1,100 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.haiprj.games.squarepuzzle'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "com.haiprj.games.squarepuzzle"
+        minSdk 24
+        targetSdk 33
+        versionCode 100
+        versionName "1.0.0"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        def formattedDate = new Date().format('hh.mm.MM.dd.yyyy')
+        archivesBaseName = "Base_V${versionName}_${formattedDate}"
+    }
+
+    flavorDimensions "dimen"
+    productFlavors {
+        vDevelop_ {
+            applicationId "com.example.develop.squarepuzzle.test"
+            buildConfigField "boolean", "TEST_AD", "false"
+            buildConfigField "boolean", "PURCHASED", "false"
+            dimension "dimen"
+            versionName "develop"
+
+
+            def addConstantTo = { target, constantName, constantValue ->
+                target.manifestPlaceholders += [(constantName): constantValue]
+                target.buildConfigField "String", "${constantName}", "\"${constantValue}\""
+            }
+            addConstantTo(owner, "APP_ID", "ca-app-pub-3940256099942544~3347511713")
+
+
+        }
+
+        vOfficial_ {
+            applicationId "com.haiprj.games.squarepuzzle"
+
+            buildConfigField "boolean", "TEST_AD", "false"
+            buildConfigField "boolean", "PURCHASED", "false"
+            dimension "dimen"
+
+            def addConstantTo = { target, constantName, constantValue ->
+                target.manifestPlaceholders += [(constantName): constantValue]
+                target.buildConfigField "String", "${constantName}", "\"${constantValue}\""
+            }
+            addConstantTo(owner, "APP_ID", "ca-app-pub-1903284124203626~6433681215")
+
+        }
+    }
+//    signingConfigs {
+//        release {
+//            storeFile file('key/release.jks')
+//            storePassword 'com.haiprj.games.wukongfly'
+//            keyAlias 'release'
+//            keyPassword 'com.haiprj.games.wukongfly'
+//        }
+//    }
+
+    buildTypes {
+        release {
+            //signingConfigs signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            signingConfig signingConfigs.release
+        }
+
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        dataBinding true
+        viewBinding true
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'com.github.hai161102:AndroidAppLib:1.0.6'
+    implementation 'com.google.android.gms:play-services-ads:22.0.0'
+    implementation "com.google.android.gms:play-services-games-v2:17.0.0"
+    implementation 'com.google.code.gson:gson:2.10.1'
+}
