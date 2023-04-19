@@ -1,11 +1,13 @@
 package com.haiprj.games.squarepuzzle.models;
 
 import android.graphics.Canvas;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.view.MotionEvent;
 
 import com.haiprj.games.squarepuzzle.Const;
 import com.haiprj.games.squarepuzzle.utils.BitmapContainer;
+import com.haiprj.games.squarepuzzle.utils.GameRandom;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,37 +15,106 @@ import java.util.Random;
 
 public class Shape extends RectF {
 
-    private final Random random;
     private final int[][] struct;
     private final List<Square> squares = new ArrayList<>();
+    private final int indexImage;
     private float lastX;
     private float lastY;
     public boolean isHover;
     private boolean isOnTable;
     private ShapeListener listener;
-    private SpawnSpace spawnSpace;
+    private int numberColor;
+    private float width, height;
 
-    public Shape(SpawnSpace spawnSpace, float left, float top) {
+    public Shape(float left, float top) {
         super(left, top, 0, 0);
-        this.spawnSpace = spawnSpace;
-        random = new Random();
-        int index = random.nextInt(GameMatrix.getInstance().count());
-        int numberColor = random.nextInt(BitmapContainer.getInstance().squaresBitmap.length);
-        struct = GameMatrix.getInstance().getStruct(index);
-        for (int i = 0; i < struct.length; i++) {
-            for (int j = 0; j < struct[i].length; j++) {
-                if (struct[i][j] == 0) continue;
-                Square square = new Square(
-                        BitmapContainer.getInstance().squaresBitmap[numberColor],
-                        i * Const.squareSize + left,
-                        j * Const.squareSize + top
-                );
-                squares.add(square);
-            }
-        }
+        setSize(1);
+        indexImage = GameRandom.getInstance().nextInt();
+        Random random = new Random();
+        numberColor = random.nextInt(BitmapContainer.getInstance().squaresBitmap.length);
+        struct = GameMatrix.getInstance().getStruct(indexImage);
+        updateView();
         updateSize();
     }
 
+    public Shape(Shape shape) {
+        super(shape.left, shape.top, 0, 0);
+        setSize(1);
+        indexImage = shape.indexImage;
+        struct = shape.getStruct();
+        updateViewGray();
+        updateSize();
+    }
+    private void updateView() {
+        squares.clear();
+        int x = 0;
+        int y = 0;
+        while (x < struct.length && y < struct[x].length) {
+            if (struct[x][y] == 1)
+            {
+                Square square = new Square(
+                        BitmapContainer.getInstance().squaresBitmap[numberColor],
+                        x * this.width + left,
+                        y * this.height + top
+                );
+                square.resize(this.width, this.height);
+                squares.add(square);
+
+            }
+            x++;
+            if (x >= struct.length) {
+                x = 0;
+                y++;
+            }
+        }
+//        for (int i = 0; i < struct[0].length; i++) {
+//            for (int j = 0; j < struct[i].length; j++) {
+//                if (struct[j][i] == 0) continue;
+//                Square square = new Square(
+//                        BitmapContainer.getInstance().squaresBitmap[numberColor],
+//                        j * this.width + left,
+//                        i * this.height + top
+//                );
+//                square.resize(this.width, this.height);
+//                squares.add(square);
+//            }
+//        }
+    }
+
+    private void updateViewGray() {
+        squares.clear();
+        int x = 0;
+        int y = 0;
+        while (x < struct.length && y < struct[x].length) {
+            if (struct[x][y] == 1)
+            {
+                Square square = new Square(
+                        BitmapContainer.getInstance().gray,
+                        x * this.width + left,
+                        y * this.height + top
+                );
+                square.resize(this.width, this.height);
+                squares.add(square);
+
+            }
+            x++;
+            if (x >= struct.length) {
+                x = 0;
+                y++;
+            }
+        }
+    }
+
+    public void setPoint(PointF point) {
+        this.left = point.x;
+        this.top = point.y;
+        updateViewGray();
+        updateSize();
+    }
+    private void setSize(float scale) {
+        width = Const.squareSize * scale;
+        height = Const.squareSize * scale;
+    }
     public void updateSize() {
         this.right = struct.length * Const.squareSize + left;
         this.bottom = struct[0].length * Const.squareSize + top;
@@ -73,6 +144,10 @@ public class Shape extends RectF {
 //        canvas.drawRect(this, paint);
     }
 
+    public int getIndexImage() {
+        return indexImage;
+    }
+
     boolean isTouch = false;
     public void onTouch(MotionEvent event) {
         float x = event.getX();
@@ -95,7 +170,7 @@ public class Shape extends RectF {
                 lastY = y;
                 this.left += deltaX;
                 this.top += deltaY;
-
+                //scaleSize(1);
                 updateSize();
                 updateChild(deltaX, deltaY);
                 break;
@@ -103,14 +178,17 @@ public class Shape extends RectF {
                 isHover = false;
                 if (isOnTable) {
                     addToTable();
-                    listener.onDestroy();
                 }
                 break;
         }
     }
 
-    private void addToTable() {
+    public boolean isTouch() {
+        return isTouch;
+    }
 
+    private void addToTable() {
+        listener.onAdd();
     }
 
     public boolean isOnTable() {
@@ -121,7 +199,22 @@ public class Shape extends RectF {
         isOnTable = onTable;
     }
 
+
+    public int getNumberColor() {
+        return numberColor;
+    }
+
+
+    public ShapeListener getListener() {
+        return listener;
+    }
+
+    public List<Square> getSquares() {
+        return squares;
+    }
+
     public interface ShapeListener {
+        void onAdd();
         void onDestroy();
     }
 }

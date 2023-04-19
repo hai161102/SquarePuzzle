@@ -20,6 +20,8 @@ public abstract class BaseAnimation implements Runnable {
     @SuppressWarnings("BusyWait")
     @Override
     public void run() {
+
+
         double drawInterval = 1000000000f / FPS;
         double nextTime = System.nanoTime() + drawInterval;
         listener.onStart();
@@ -37,21 +39,17 @@ public abstract class BaseAnimation implements Runnable {
                 Thread.sleep((long) remainTime);
                 nextTime += drawInterval;
             } catch (InterruptedException ignored) {
-                animationThread.interrupt();
-                animationThread = null;
-                listener.onEnd();
             }
         }
     }
 
     public void start() {
-        if (animationThread == null) animationThread = new Thread(this);
+        animationThread = new Thread(this);
         animationThread.start();
     }
 
     public void end() {
-        if (animationThread != null) animationThread.interrupt();
-        animationThread = null;
+        if (animationThread != null) animationThread = null;
         listener.onEnd();
     }
 
@@ -59,5 +57,6 @@ public abstract class BaseAnimation implements Runnable {
         void onStart();
         void onUpdate();
         void onEnd();
+
     }
 }

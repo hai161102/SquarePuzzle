@@ -5,13 +5,12 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black"
         tools:context=".ui.activity.MainActivity">
-
-        <com.haiprj.games.squarepuzzle.ui.widget.GameSurface
-            android:id="@+id/gameSurface"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Start"
+            android:id="@+id/startGame"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

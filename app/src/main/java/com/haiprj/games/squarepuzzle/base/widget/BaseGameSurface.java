@@ -4,8 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -13,43 +13,48 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
 public abstract class BaseGameSurface extends SurfaceView implements SurfaceHolder.Callback, View.OnTouchListener {
 
     protected static final int FPS = 60;
-    protected SurfaceHolder surfaceHolder;
+    protected final SurfaceHolder surfaceHolder;
     protected boolean isGameOver = false;
-
+    protected Activity activity;
     protected GameThread gameThread;
+    protected boolean isPause;
 
     public BaseGameSurface(Context context) {
         super(context);
+        surfaceHolder = getHolder();
         init();
     }
 
     public BaseGameSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
+        surfaceHolder = getHolder();
         init();
     }
 
     public BaseGameSurface(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        surfaceHolder = getHolder();
         init();
     }
 
     public BaseGameSurface(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        surfaceHolder = getHolder();
         init();
     }
 
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
     protected void init() {
-        this.surfaceHolder = getHolder();
         this.surfaceHolder.addCallback(this);
-        this.setBackgroundColor(Color.TRANSPARENT);
-        this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         this.setOnTouchListener(this);
     }
 
@@ -60,12 +65,10 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
     protected abstract void gameDraw(Canvas canvas);
 
     @Override
-    public void draw(Canvas canvas) {
-        super.draw(canvas);
-        try {
-            gameDraw(canvas);
-        }catch (Exception ignored) {
-
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        if (activity != null) {
+            activity.runOnUiThread(() -> gameDraw(canvas));
         }
     }
 
@@ -80,9 +83,8 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
      */
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
-        this.surfaceHolder = holder;
+        startThread();
         initView(this.surfaceHolder);
-
     }
 
     /**
@@ -98,17 +100,12 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
      */
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-        this.surfaceHolder = holder;
-
+        Log.d("ListenSurface", "surfaceChanged: " + (gameThread != null));
     }
 
     public void startThread() {
 //        post(runnable);
-        if (gameThread == null)
-        {
-            gameThread = new GameThread(getHolder(), this);
-
-        }
+        gameThread = new GameThread(getHolder(), this);
         gameThread.setRunning(true);
         gameThread.start();
     }
@@ -124,24 +121,21 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
      */
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
-        this.surfaceHolder = holder;
+        Log.d("ListenSurface", "surfaceDestroyed: ");
         stopThread();
     }
 
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+    }
+
     public void stopThread() {
-        boolean retry = true;
         gameThread.setRunning(false);
-        while (retry)
-        {
-            try
-            {
-                gameThread.join();
-                retry = false;
-            }
-            catch (InterruptedException e)
-            {
-                Log.d(getClass().getSimpleName(), "Interrupted Exception", e);
-            }
+        try {
+            gameThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 //        removeCallbacks(runnable);
     }
@@ -160,32 +154,32 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
         onTouch(event);
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                onTouchDown(v, event);
+                onTouchDown(event);
                 break;
             case MotionEvent.ACTION_MOVE:
-                onTouchMove(v, event);
+                onTouchMove(event);
                 break;
             case MotionEvent.ACTION_UP:
-                onTouchUp(v, event);
+                onTouchUp(event);
                 break;
         }
         return true;
     }
 
-    protected void onTouchUp(View view, MotionEvent event) {
+    protected void onTouchUp(MotionEvent event) {
 
     }
 
-    protected void onTouchMove(View view, MotionEvent event) {
-        Log.d("TouchListener", "onTouchMove: Moving");
+    protected void onTouchMove(MotionEvent event) {
     }
 
-    protected void onTouchDown(View view, MotionEvent event) {
+    protected void onTouchDown(MotionEvent event) {
     }
 
     protected void onTouch(MotionEvent event) {
 
     }
+
     public class GameThread extends Thread
     {
         private final SurfaceHolder holder;
@@ -219,7 +213,7 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
                     canvas = holder.lockHardwareCanvas();
                     synchronized (holder)
                     {
-                        postInvalidate();
+                        invalidate();
                     }
                     try {
                         if (remainTime < 0) {
@@ -251,13 +245,28 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
         }
     }
 
+    protected void render(Canvas canvas) {
+        gameDraw(canvas);
+    }
+
     protected void updateAll() {
-        ((Activity) getContext()).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                update();
+        ((Activity) getContext()).runOnUiThread(this::update);
+    }
+
+    public void onPause() {
+        stopThread();
+        synchronized (this.surfaceHolder) {
+            isPause = true;
+        }
+    }
+
+    public void onResume() {
+        if (isPause) {
+            startThread();
+            synchronized (this.surfaceHolder){
+                isPause = false;
             }
-        });
+        }
     }
 
 }
