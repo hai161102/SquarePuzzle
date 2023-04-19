@@ -20,8 +20,6 @@ public class Shape extends RectF {
     private final int indexImage;
     private float lastX;
     private float lastY;
-    public boolean isHover;
-    private boolean isOnTable;
     private ShapeListener listener;
     private int numberColor;
     private float width, height;
@@ -156,14 +154,13 @@ public class Shape extends RectF {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 isTouch = this.contains(x, y);
-                isHover = true;
                 lastX = x;
                 lastY = y;
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 if (!isTouch) return;
-                isHover = true;
+                listener.onTouchMove();
                 float deltaX = x - lastX;
                 float deltaY = y - lastY;
                 lastX = x;
@@ -175,9 +172,9 @@ public class Shape extends RectF {
                 updateChild(deltaX, deltaY);
                 break;
             case MotionEvent.ACTION_UP:
-                isHover = false;
-                if (isOnTable) {
-                    addToTable();
+                if (isTouch){
+                    listener.onTouchUp();
+                    isTouch = false;
                 }
                 break;
         }
@@ -187,34 +184,24 @@ public class Shape extends RectF {
         return isTouch;
     }
 
-    private void addToTable() {
-        listener.onAdd();
-    }
-
-    public boolean isOnTable() {
-        return isOnTable;
-    }
-
-    public void setOnTable(boolean onTable) {
-        isOnTable = onTable;
-    }
-
 
     public int getNumberColor() {
         return numberColor;
-    }
-
-
-    public ShapeListener getListener() {
-        return listener;
     }
 
     public List<Square> getSquares() {
         return squares;
     }
 
+    public void destroy() {
+        listener.onDestroy();
+    }
+
     public interface ShapeListener {
-        void onAdd();
         void onDestroy();
+
+        void onTouchMove();
+
+        void onTouchUp();
     }
 }

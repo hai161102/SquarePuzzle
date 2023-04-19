@@ -177,17 +177,11 @@ public class Table extends RectF {
 
     public void update(Shape shape) {
         if (isContainShape(shape)) {
-            shape.setOnTable(true);
             previewLocation(shape);
             grayShape = new Shape(shape);
             grayShape.setPoint(previewPoint);
-            if (!shape.isTouch()) {
-                path = null;
-                grayShape = null;
-            }
 
         } else {
-            shape.setOnTable(false);
             path = null;
             grayShape = null;
         }
@@ -477,8 +471,13 @@ public class Table extends RectF {
         listener.onRemove();
     }
 
-    public TableListener getListener() {
-        return listener;
+
+    public void onAdd() {
+        listener.onAdd();
+    }
+
+    public boolean onDropShape(Shape shape) {
+        return addShape(shape);
     }
 
     class ShapePreview extends Path {

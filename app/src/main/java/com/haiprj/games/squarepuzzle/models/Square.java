@@ -98,17 +98,27 @@ public class Square extends RectF {
     float height;
     float startTop;
     float startLeft;
+    boolean isUp = true;
     private void onStartAnimation() {
         width = this.width();
         height = this.height();
-        this.left += 30;
-        this.top -= 30;
+        isUp = true;
     }
     public void onAnimationRun() {
-        this.top += 30;
-        if (this.top > startTop + height * 2){
-            destroyAnimation.end();
+        if (isUp) {
+            this.top -= Const.squareSize / 10f;
+            this.left -= Const.squareSize / 20f;
+            if (this.top <= startTop - Const.squareSize) {
+                isUp = false;
+            }
         }
+        else {
+            this.top += 30;
+            if (this.top > table.bottom + height){
+                destroyAnimation.end();
+            }
+        }
+
     }
 //
 //    private int col, row;

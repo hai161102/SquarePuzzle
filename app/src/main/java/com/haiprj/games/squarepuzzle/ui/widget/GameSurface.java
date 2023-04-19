@@ -18,30 +18,30 @@ import com.haiprj.games.squarepuzzle.models.Table;
 
 public class GameSurface extends BaseGameSurface {
 
-    private final Table table;
+    private Table table;
     private final int padding = 96;
     private SpawnTable spawnTable;
     private int score = 0;
     public GameSurface(Context context) {
         super(context);
-        table = new Table(padding, padding);
+
     }
 
     public GameSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
-        table = new Table(padding, padding);
+
 
     }
 
     public GameSurface(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        table = new Table(padding, padding);
+
 
     }
 
     public GameSurface(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        table = new Table(padding, padding);
+
     }
 
     @Override
@@ -53,6 +53,8 @@ public class GameSurface extends BaseGameSurface {
     @Override
     protected void initView(SurfaceHolder surfaceHolder) {
         Const.squareSize = (this.getWidth() - padding * 2) / Const.TAB_COL;
+        if (table == null)
+            table = new Table(padding, padding);
         table.setListener(new TableListener() {
             @Override
             public void onRemove() {
@@ -61,18 +63,23 @@ public class GameSurface extends BaseGameSurface {
 
             @Override
             public void onAdd() {
-                if (
-                        !table.tryAdd(spawnTable.getSpaceFirst().getShape())
-                                && !table.tryAdd(spawnTable.getSpaceSecond().getShape())
-                                && !table.tryAdd(spawnTable.getSpaceThird().getShape())
-                ){
+                if (isAllNotAdd()){
                     gameOver();
                 }
             }
         });
-        spawnTable = new SpawnTable(table.left, table.bottom + padding, table);
+        if (spawnTable == null)
+            spawnTable = new SpawnTable(table, 0, table.bottom + padding, this.getWidth(), 0);
+
+//        spawnTable.updateSize(this.getWidth() / 2f - spawnTable.width() / 2f, spawnTable.top);
     }
 
+    private boolean isAllNotAdd() {
+        for (SpawnSpace spawnSpace : spawnTable.getSpawnSpaces()) {
+            if (table.tryAdd(spawnSpace.getShape())) return false;
+        }
+        return true;
+    }
     @Override
     protected void update() {
         if (spawnTable != null)
@@ -103,9 +110,12 @@ public class GameSurface extends BaseGameSurface {
     protected void onTouch(MotionEvent event) {
         super.onTouch(event);
         if (spawnTable != null) {
-            spawnTable.getSpaceFirst().getShape().onTouch(event);
-            spawnTable.getSpaceSecond().getShape().onTouch(event);
-            spawnTable.getSpaceThird().getShape().onTouch(event);
+//            spawnTable.getSpaceFirst().getShape().onTouch(event);
+//            spawnTable.getSpaceSecond().getShape().onTouch(event);
+//            spawnTable.getSpaceThird().getShape().onTouch(event);
+            for (SpawnSpace spawnSpace : spawnTable.getSpawnSpaces()) {
+                spawnSpace.getShape().onTouch(event);
+            }
         }
         //if (shape.contains(event.getX(), event.getY()))
     }

@@ -1,14 +1,10 @@
 package com.haiprj.games.squarepuzzle.models;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 
 import com.haiprj.games.squarepuzzle.Const;
 
@@ -18,12 +14,30 @@ public class SpawnSpace extends RectF {
     private final int padding = 10;
     private Paint test;
     private PointF defaultPoint;
-    private final Shape.ShapeListener shapeListener;
-    public SpawnSpace(float left, float top, Shape.ShapeListener shapeListener) {
-        super(left, top, 0, 0);
-        this.shapeListener = shapeListener;
-        this.right = left + Const.squareSize * 3 + padding * 2;
-        this.bottom = top + Const.squareSize * 3 + padding * 2;
+    private final Shape.ShapeListener spawnShapeListener;
+    private final Shape.ShapeListener shapeListener = new Shape.ShapeListener() {
+
+        @Override
+        public void onDestroy() {
+            shape = null;
+            spawnShapeListener.onDestroy();
+        }
+
+        @Override
+        public void onTouchMove() {
+            spawnShapeListener.onTouchMove();
+        }
+
+        @Override
+        public void onTouchUp() {
+            spawnShapeListener.onTouchUp();
+        }
+    };
+
+    public SpawnSpace(float left, float top, float right, float bottom, Shape.ShapeListener shapeListener) {
+        super(left, top, right, bottom);
+        this.spawnShapeListener = shapeListener;
+        this.bottom = top + Const.squareSize * 3 + padding * 5;
         shape = createShape();
         test = new Paint();
         test.setStyle(Paint.Style.STROKE);
@@ -33,21 +47,8 @@ public class SpawnSpace extends RectF {
         float x = this.left + padding;
         float y = this.top + padding;
 
-        Shape s = new Shape(
-                x,
-                y
-        );
-        s.setListener(new Shape.ShapeListener() {
-            @Override
-            public void onAdd() {
-                shapeListener.onAdd();
-            }
-
-            @Override
-            public void onDestroy() {
-                shapeListener.onDestroy();
-            }
-        });
+        Shape s = new Shape(x, y);
+        s.setListener(shapeListener);
         //s.scaleSize(0.5f);
         float sX = s.left;
         float sY = s.top;
@@ -72,9 +73,6 @@ public class SpawnSpace extends RectF {
     }
 
     public void update() {
-        if (!shape.isHover) {
-            resetToDefaultPoint();
-        }
     }
     public Shape getShape() {
         return shape;
