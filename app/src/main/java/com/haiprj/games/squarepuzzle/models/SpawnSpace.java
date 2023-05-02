@@ -1,5 +1,6 @@
 package com.haiprj.games.squarepuzzle.models;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -7,6 +8,8 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 
 import com.haiprj.games.squarepuzzle.Const;
+import com.haiprj.games.squarepuzzle.base.utils.GameUtils;
+import com.haiprj.games.squarepuzzle.utils.BitmapContainer;
 
 public class SpawnSpace extends RectF {
 
@@ -14,6 +17,7 @@ public class SpawnSpace extends RectF {
     private final int padding = 10;
     private Paint test;
     private PointF defaultPoint;
+    private Bitmap borderBitmap;
     private final Shape.ShapeListener spawnShapeListener;
     private final Shape.ShapeListener shapeListener = new Shape.ShapeListener() {
 
@@ -34,6 +38,7 @@ public class SpawnSpace extends RectF {
         }
     };
 
+
     public SpawnSpace(float left, float top, float right, float bottom, Shape.ShapeListener shapeListener) {
         super(left, top, right, bottom);
         this.spawnShapeListener = shapeListener;
@@ -42,6 +47,8 @@ public class SpawnSpace extends RectF {
         test = new Paint();
         test.setStyle(Paint.Style.STROKE);
         test.setColor(Color.WHITE);
+        this.borderBitmap
+                = Bitmap.createScaledBitmap(BitmapContainer.getInstance().borderSpawnBitmap, (int) this.width(), (int) this.height(), true);
     }
     private Shape createShape(){
         float x = this.left + padding;
@@ -62,13 +69,21 @@ public class SpawnSpace extends RectF {
         return s;
     }
 
+    public void setFlipBitmap() {
+        this.borderBitmap = GameUtils.createFlippedBitmap(this.borderBitmap, false, true);
+    }
+
     public void setDefaultPoint(PointF defaultPoint) {
         this.defaultPoint = defaultPoint;
     }
     Canvas canvas;
     public void draw(Canvas canvas) {
         this.canvas = canvas;
-        this.canvas.drawRect(this, test);
+//        this.canvas.drawRect(this, test);
+        Bitmap b = borderBitmap;
+        float borderX = this.centerX() - b.getWidth() / 2f;
+        float borderY = this.centerY() - b.getHeight() / 2f;
+        this.canvas.drawBitmap(b, borderX, borderY, null);
         shape.draw(this.canvas);
     }
 

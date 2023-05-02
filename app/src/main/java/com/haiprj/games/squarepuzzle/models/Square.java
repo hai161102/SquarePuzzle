@@ -10,6 +10,7 @@ import android.graphics.RectF;
 import com.haiprj.games.squarepuzzle.Const;
 import com.haiprj.games.squarepuzzle.animations.DestroyAnimation;
 import com.haiprj.games.squarepuzzle.base.animation.BaseAnimation;
+import com.haiprj.games.squarepuzzle.utils.BitmapContainer;
 
 public class Square extends RectF {
 
@@ -18,6 +19,7 @@ public class Square extends RectF {
     private final DestroyAnimation destroyAnimation;
     private Table table;
     private Point tablePoint;
+    private Bitmap[] bitmapsDestroy;
 
     public void setTablePoint(Point tablePoint) {
         this.tablePoint = tablePoint;
@@ -37,7 +39,7 @@ public class Square extends RectF {
         this.startLeft = this.left;
         this.startTop = this.top;
         init();
-        destroyAnimation = new DestroyAnimation(60, new BaseAnimation.AnimationActionListener() {
+        destroyAnimation = new DestroyAnimation(12, new BaseAnimation.AnimationActionListener() {
             @Override
             public void onStart() {
                 onStartAnimation();
@@ -65,7 +67,7 @@ public class Square extends RectF {
         test.setStyle(Paint.Style.FILL);
         test.setColor(Color.WHITE);
         setBitmap(bitmap);
-
+        this.bitmapsDestroy = BitmapContainer.getInstance().bitmapsSquareDestroy;
     }
 
     public void draw(Canvas canvas) {
@@ -99,24 +101,18 @@ public class Square extends RectF {
     float startTop;
     float startLeft;
     boolean isUp = true;
+    int destroyCount = 0;
     private void onStartAnimation() {
         width = this.width();
         height = this.height();
         isUp = true;
+        destroyCount = 0;
     }
     public void onAnimationRun() {
-        if (isUp) {
-            this.top -= Const.squareSize / 10f;
-            this.left -= Const.squareSize / 20f;
-            if (this.top <= startTop - Const.squareSize) {
-                isUp = false;
-            }
-        }
-        else {
-            this.top += 30;
-            if (this.top > table.bottom + height){
-                destroyAnimation.end();
-            }
+        setBitmap(bitmapsDestroy[destroyCount]);
+        destroyCount++;
+        if (destroyCount >= bitmapsDestroy.length) {
+            destroyAnimation.end();
         }
 
     }

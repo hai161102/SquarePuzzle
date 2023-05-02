@@ -19,6 +19,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
         loadImageSquare();
         loadBoard();
         loadGraySquare();
+        loadBitmapSquareDestroy();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -80,6 +81,17 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
                 BitmapContainer.getInstance().borderBoardBitmap = bitmaps[0];
             }
         },"images/border_board.png").execute();
+        new LoadBitmapStream(this, new LoadBitmapUtil.OnLoadListener() {
+            @Override
+            public void onLoad() {
+
+            }
+
+            @Override
+            public void onDone(Bitmap[] bitmaps) {
+                BitmapContainer.getInstance().borderSpawnBitmap = bitmaps[0];
+            }
+        },"images/border_spawn.png").execute();
     }
     public void loadGraySquare() {
         new LoadBitmapStream(this, new LoadBitmapUtil.OnLoadListener() {
@@ -93,6 +105,22 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
                 BitmapContainer.getInstance().gray = bitmaps[0];
             }
         }, "images/gray.png").execute();
+    }
+    private void loadBitmapSquareDestroy() {
+        new LoadBitmapStream(this, new LoadBitmapUtil.OnLoadListener() {
+            @Override
+            public void onLoad() {
+
+            }
+
+            @Override
+            public void onDone(Bitmap[] bitmaps) {
+                BitmapContainer.getInstance().bitmapsSquareDestroy = bitmaps;
+            }
+        },
+             "images/flash_1.png",
+             "images/flash_2.png"
+        ).execute();
     }
     @Override
     protected int getLayoutId() {

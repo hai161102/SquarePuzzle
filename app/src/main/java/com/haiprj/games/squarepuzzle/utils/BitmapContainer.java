@@ -7,7 +7,9 @@ public class BitmapContainer {
     public Bitmap[] squaresBitmap;
     public Bitmap boardBitmap;
     public Bitmap borderBoardBitmap;
+    public Bitmap borderSpawnBitmap;
     public Bitmap gray;
+    public Bitmap[] bitmapsSquareDestroy;
     private BitmapContainer() {
     }
 

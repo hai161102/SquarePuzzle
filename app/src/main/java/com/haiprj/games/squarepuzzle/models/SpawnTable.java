@@ -98,6 +98,10 @@ public class SpawnTable extends RectF {
             };
 
             spawnSpaces[i] = new SpawnSpace(l, t,l + divider, 0, shapeListener);
+
+            if (i == 1) {
+                spawnSpaces[i].setFlipBitmap();
+            }
         }
     }
 //

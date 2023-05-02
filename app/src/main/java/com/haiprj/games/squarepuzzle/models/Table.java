@@ -359,30 +359,30 @@ public class Table extends RectF {
         return false;
     }
 
-    private void checkTable() {
-        for (int i = 0; i < mapMatrix.length; i++) {
-            for (int j = 0; j < mapMatrix[i].length; j++) {
-                checkColAndRowAt(i, j);
-            }
-        }
-    }
-    private void checkColAndRowAt(int col, int row) {
-        boolean isFullCol = isFullCol(col);
-        boolean isFullRow = isFullRow(row);
-        if (isFullCol && isFullRow) {
-            removeColAt(col);
-            removeRowAt(row);
-            dropSquare();
-        } else if (isFullCol || isFullRow) {
-            if (isFullCol) {
-                removeColAt(col);
-            } else {
-                removeRowAt(row);
-            }
-            dropSquare();
-        }
-
-    }
+//    private void checkTable() {
+//        for (int i = 0; i < mapMatrix.length; i++) {
+//            for (int j = 0; j < mapMatrix[i].length; j++) {
+//                checkColAndRowAt(i, j);
+//            }
+//        }
+//    }
+//    private void checkColAndRowAt(int col, int row) {
+//        boolean isFullCol = isFullCol(col);
+//        boolean isFullRow = isFullRow(row);
+//        if (isFullCol && isFullRow) {
+//            removeColAt(col);
+//            removeRowAt(row);
+//            dropSquare();
+//        } else if (isFullCol || isFullRow) {
+//            if (isFullCol) {
+//                removeColAt(col);
+//            } else {
+//                removeRowAt(row);
+//            }
+//            dropSquare();
+//        }
+//
+//    }
 
     private void removeRowAt(int row) {
         for (int i = 0; i < Const.TAB_COL; i++) {

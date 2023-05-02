@@ -93,7 +93,7 @@ public class GameSurface extends BaseGameSurface {
         Log.d("GameOver", "gameOver: ");
         Toast.makeText(this.getContext(), "Game Over", Toast.LENGTH_LONG).show();
         isGameOver = true;
-//        stopThread();
+        stopThread();
     }
 
     @Override
