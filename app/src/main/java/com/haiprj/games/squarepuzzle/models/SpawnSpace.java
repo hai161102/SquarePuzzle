@@ -15,7 +15,6 @@ public class SpawnSpace extends RectF {
 
     private Shape shape;
     private final int padding = 10;
-    private Paint test;
     private PointF defaultPoint;
     private Bitmap borderBitmap;
     private final Shape.ShapeListener spawnShapeListener;
@@ -44,7 +43,7 @@ public class SpawnSpace extends RectF {
         this.spawnShapeListener = shapeListener;
         this.bottom = top + Const.squareSize * 3 + padding * 5;
         shape = createShape();
-        test = new Paint();
+        Paint test = new Paint();
         test.setStyle(Paint.Style.STROKE);
         test.setColor(Color.WHITE);
         this.borderBitmap

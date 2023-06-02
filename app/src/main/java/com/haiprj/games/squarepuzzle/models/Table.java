@@ -13,6 +13,7 @@ import android.graphics.RectF;
 import androidx.annotation.Nullable;
 
 import com.haiprj.games.squarepuzzle.Const;
+import com.haiprj.games.squarepuzzle.interfaces.OnAddCallback;
 import com.haiprj.games.squarepuzzle.interfaces.TableListener;
 import com.haiprj.games.squarepuzzle.utils.BitmapContainer;
 
@@ -61,8 +62,6 @@ public class Table extends RectF {
                     this.left + i * Const.squareSize,
                     this.top + j * Const.squareSize
             );
-            tableMatrix[i][j].cellSquare.setTable(this);
-            tableMatrix[i][j].cellSquare.setTablePoint(new Point(i, j));
             i++;
             if (i >= tableMatrix.length) {
                 i = 0;
@@ -196,11 +195,11 @@ public class Table extends RectF {
 
 
     public void previewLocation(Shape shape) {
-        path = drawPath(shape);
+        //path = drawPath(shape);
         previewPoint = nearestMatrix(shape);
         Matrix matrix = new Matrix();
         matrix.postTranslate(previewPoint.x, previewPoint.y);
-        path.transform(matrix);
+        //path.transform(matrix);
     }
 
 
@@ -309,7 +308,7 @@ public class Table extends RectF {
     }
 
 
-    public boolean addShape(Shape shape) {
+    public void addShape(Shape shape, OnAddCallback onAddCallback) {
         if (previewPoint != null && grayShape != null && isContainShape(grayShape)) {
             Point point = new Point();
             for (int i = 0; i < points.length; i++) {
@@ -329,7 +328,10 @@ public class Table extends RectF {
                             temp[i + point.x][j + point.y] = shape.getStruct()[i][j];
                     }
                 }
-            } else return false;
+            } else {
+                onAddCallback.onAddFailure();
+                return;
+            }
             for (int i = 0; i < mapMatrix.length; i++) {
                 System.arraycopy(temp[i], 0, mapMatrix[i], 0, mapMatrix[i].length);
             }
@@ -349,40 +351,17 @@ public class Table extends RectF {
             for (Integer integer : listRowFull) {
                 removeRowAt(integer);
                 dropSquare();
+                listener.onRemove();
             }
             for (Integer integer : listColFull) {
                 removeColAt(integer);
                 dropSquare();
+                listener.onRemove();
             }
-            return true;
+            onAddCallback.onAddDone();
         }
-        return false;
+        onAddCallback.onAddFailure();
     }
-
-//    private void checkTable() {
-//        for (int i = 0; i < mapMatrix.length; i++) {
-//            for (int j = 0; j < mapMatrix[i].length; j++) {
-//                checkColAndRowAt(i, j);
-//            }
-//        }
-//    }
-//    private void checkColAndRowAt(int col, int row) {
-//        boolean isFullCol = isFullCol(col);
-//        boolean isFullRow = isFullRow(row);
-//        if (isFullCol && isFullRow) {
-//            removeColAt(col);
-//            removeRowAt(row);
-//            dropSquare();
-//        } else if (isFullCol || isFullRow) {
-//            if (isFullCol) {
-//                removeColAt(col);
-//            } else {
-//                removeRowAt(row);
-//            }
-//            dropSquare();
-//        }
-//
-//    }
 
     private void removeRowAt(int row) {
         for (int i = 0; i < Const.TAB_COL; i++) {
@@ -451,33 +430,6 @@ public class Table extends RectF {
     public void shapeDestroy() {
         path = null;
         grayShape = null;
-    }
-
-//    private final List<Square> listClear = new ArrayList<>();
-//
-//    public void clearSquare(Square square) {
-////        for (int i = 0; i < allSquares.length; i++) {
-////            for (int j = 0; j < allSquares[i].length; j++) {
-////                if (allSquares[i][j] == square) allSquares[i][j] = null;
-////            }
-////        }
-////        if (listClear.size() >= 30) listClear.clear();
-////        listClear.add(square);
-////        listSquare.remove(square);
-//        square = null;
-//    }
-
-    public void clearSquare() {
-        listener.onRemove();
-    }
-
-
-    public void onAdd() {
-        listener.onAdd();
-    }
-
-    public boolean onDropShape(Shape shape) {
-        return addShape(shape);
     }
 
     class ShapePreview extends Path {

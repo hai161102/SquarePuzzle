@@ -65,18 +65,6 @@ public class Shape extends RectF {
                 y++;
             }
         }
-//        for (int i = 0; i < struct[0].length; i++) {
-//            for (int j = 0; j < struct[i].length; j++) {
-//                if (struct[j][i] == 0) continue;
-//                Square square = new Square(
-//                        BitmapContainer.getInstance().squaresBitmap[numberColor],
-//                        j * this.width + left,
-//                        i * this.height + top
-//                );
-//                square.resize(this.width, this.height);
-//                squares.add(square);
-//            }
-//        }
     }
 
     private void updateViewGray() {
@@ -136,10 +124,6 @@ public class Shape extends RectF {
         for (Square square : squares) {
             square.draw(canvas);
         }
-//        Paint paint = new Paint();
-//        paint.setColor(Color.GREEN);
-//        paint.setStyle(Paint.Style.FILL);
-//        canvas.drawRect(this, paint);
     }
 
     public int getIndexImage() {

@@ -15,23 +15,10 @@ import com.haiprj.games.squarepuzzle.utils.BitmapContainer;
 public class Square extends RectF {
 
     private Bitmap bitmap;
-    private Paint test;
     private final DestroyAnimation destroyAnimation;
-    private Table table;
-    private Point tablePoint;
     private Bitmap[] bitmapsDestroy;
 
-    public void setTablePoint(Point tablePoint) {
-        this.tablePoint = tablePoint;
-    }
 
-    public Point getTablePoint() {
-        return tablePoint;
-    }
-
-    public void setTable(Table table) {
-        this.table = table;
-    }
 
     public Square(Bitmap bitmap, float left, float top) {
         super(left, top, 0, 0);
@@ -53,7 +40,6 @@ public class Square extends RectF {
             @Override
             public void onEnd() {
                 Square.this.bitmap = null;
-                table.clearSquare();
             }
         });
     }
@@ -63,7 +49,7 @@ public class Square extends RectF {
     }
 
     private void init() {
-        test = new Paint();
+        Paint test = new Paint();
         test.setStyle(Paint.Style.FILL);
         test.setColor(Color.WHITE);
         setBitmap(bitmap);
@@ -93,9 +79,6 @@ public class Square extends RectF {
         this.bitmap = Bitmap.createScaledBitmap(this.bitmap, (int) (width), (int) (height), true);
     }
 
-    public void destroy() {
-        destroyAnimation.start();
-    }
     float width;
     float height;
     float startTop;
@@ -116,13 +99,6 @@ public class Square extends RectF {
         }
 
     }
-//
-//    private int col, row;
-//    public void destroy(int col, int row) {
-//        this.col = col;
-//        this.row = row;
-//        destroy();
-//    }
 
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;

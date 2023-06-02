@@ -13,7 +13,6 @@ android {
         versionCode 100
         versionName "1.0.0"
         multiDexEnabled true
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         def formattedDate = new Date().format('hh.mm.MM.dd.yyyy')
         archivesBaseName = "Base_V${versionName}_${formattedDate}"
     }

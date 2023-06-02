@@ -18,7 +18,7 @@ import com.haiprj.games.squarepuzzle.models.Table;
 
 public class GameSurface extends BaseGameSurface {
 
-    private Table table;
+    public Table table;
     private final int padding = 96;
     private SpawnTable spawnTable;
     private int score = 0;
@@ -63,17 +63,20 @@ public class GameSurface extends BaseGameSurface {
 
             @Override
             public void onAdd() {
-                if (isAllNotAdd()){
-                    gameOver();
-                }
+
             }
         });
         if (spawnTable == null)
-            spawnTable = new SpawnTable(table, 0, table.bottom + padding, this.getWidth(), 0);
+            spawnTable = new SpawnTable(this, 0, table.bottom + padding, this.getWidth(), 0);
 
 //        spawnTable.updateSize(this.getWidth() / 2f - spawnTable.width() / 2f, spawnTable.top);
     }
 
+    public void checkMaybeAdd() {
+        if (isAllNotAdd()){
+            gameOver();
+        }
+    }
     private boolean isAllNotAdd() {
         for (SpawnSpace spawnSpace : spawnTable.getSpawnSpaces()) {
             if (table.tryAdd(spawnSpace.getShape())) return false;

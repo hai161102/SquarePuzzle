@@ -10,7 +10,9 @@ import androidx.annotation.NonNull;
 
 import com.haiprj.games.squarepuzzle.R;
 import com.haiprj.games.squarepuzzle.base.view.BaseActivity;
+import com.haiprj.games.squarepuzzle.base.view.BaseDialog;
 import com.haiprj.games.squarepuzzle.databinding.ActivityGameBinding;
+import com.haiprj.games.squarepuzzle.ui.dialog.GameOverDialog;
 
 public class GameActivity extends BaseActivity<ActivityGameBinding> {
     private static final String CURRENT_SURFACE = "CURRENT_SURFACE";
@@ -22,6 +24,9 @@ public class GameActivity extends BaseActivity<ActivityGameBinding> {
     @Override
     protected void initView() {
         binding.gameSurface.setActivity(this);
+        GameOverDialog.getInstance(this, this, (key, objects) -> {
+
+        }).show();
     }
 
     @Override

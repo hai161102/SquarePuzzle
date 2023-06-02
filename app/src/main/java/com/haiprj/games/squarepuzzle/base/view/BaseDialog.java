@@ -50,13 +50,13 @@ public abstract class BaseDialog<T> extends AppCompatDialog {
         setContentView(((ViewDataBinding)binding).getRoot());
         Window window = getWindow();
         window.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        window.setLayout(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         WindowManager.LayoutParams params = window.getAttributes();
         params.gravity = Gravity.CENTER;
         window.setAttributes(params);
 
-        setCancelable(true);
-        setCanceledOnTouchOutside(true);
+        setCancelable(false);
+        setCanceledOnTouchOutside(false);
         setOnDismissListener(dialogInterface -> BaseDialog.this.onDismiss());
         setOnCancelListener(dialogInterface -> BaseDialog.this.onCancel());
         initView();
