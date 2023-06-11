@@ -95,4 +95,10 @@ public class SpawnTable extends RectF {
     public SpawnSpace[] getSpawnSpaces() {
         return spawnSpaces;
     }
+
+    public void reset() {
+        for (SpawnSpace spawnSpace : spawnSpaces) {
+            spawnSpace.addNewShape();
+        }
+    }
 }

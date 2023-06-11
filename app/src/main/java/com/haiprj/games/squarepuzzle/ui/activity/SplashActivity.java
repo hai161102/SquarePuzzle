@@ -118,8 +118,11 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
                 BitmapContainer.getInstance().bitmapsSquareDestroy = bitmaps;
             }
         },
-             "images/flash_1.png",
-             "images/flash_2.png"
+             "images/destroys/gray.png",
+             "images/destroys/gray-1.png",
+             "images/destroys/gray-2.png",
+             "images/destroys/gray-3.png",
+             "images/destroys/gray-4.png"
         ).execute();
     }
     @Override

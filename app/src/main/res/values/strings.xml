@@ -5,4 +5,7 @@
     <string name="your_score">Your Score</string>
     <string name="play_again">Play Again</string>
     <string name="exit">Exit</string>
+    <string name="start">Start</string>
+    <string name="quit">Quit</string>
+    <string name="continue_game">Continue</string>
 </resources>

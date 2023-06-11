@@ -2,26 +2,32 @@ package com.haiprj.games.squarepuzzle.ui.widget;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.haiprj.games.squarepuzzle.Const;
+import com.haiprj.games.squarepuzzle.Game;
+import com.haiprj.games.squarepuzzle.base.utils.GameSharePreference;
 import com.haiprj.games.squarepuzzle.base.widget.BaseGameSurface;
 import com.haiprj.games.squarepuzzle.interfaces.TableListener;
-import com.haiprj.games.squarepuzzle.models.Shape;
+import com.haiprj.games.squarepuzzle.models.ScoreView;
 import com.haiprj.games.squarepuzzle.models.SpawnSpace;
 import com.haiprj.games.squarepuzzle.models.SpawnTable;
 import com.haiprj.games.squarepuzzle.models.Table;
 
 public class GameSurface extends BaseGameSurface {
 
+    public ScoreView scoreView;
     public Table table;
-    private final int padding = 96;
     private SpawnTable spawnTable;
     private int score = 0;
+    private int highScore = 0;
+    public GameCallback gameCallback;
     public GameSurface(Context context) {
         super(context);
 
@@ -49,12 +55,26 @@ public class GameSurface extends BaseGameSurface {
         super.init();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressWarnings("IntegerDivisionInFloatingPointContext")
     @Override
     protected void initView(SurfaceHolder surfaceHolder) {
-        Const.squareSize = (this.getWidth() - padding * 2) / Const.TAB_COL;
+        highScore = GameSharePreference.getInstance().getInt(Const.HIGHEST_SCORE, 0);
+        if (scoreView == null) {
+            scoreView = new ScoreView(this.getContext(), 0, 0, this.getWidth());
+        }
+
+        int padding = 64;
+        Const.squareSize = (this.getHeight() * 40 / 100f - padding * 2) / Const.TAB_COL;
+        float tbWidth = Const.squareSize * Const.TAB_COL;
+        float tLeft = getWidth() / 2f - tbWidth / 2f;
+        if (tbWidth > getWidth()) {
+            Const.squareSize = (this.getWidth() - padding * 2) / Const.TAB_COL;
+            tbWidth = Const.squareSize * Const.TAB_COL;
+            tLeft = getWidth() / 2f - tbWidth / 2f;
+        }
         if (table == null)
-            table = new Table(padding, padding);
+            table = new Table(tLeft,scoreView.bottom + padding);
         table.setListener(new TableListener() {
             @Override
             public void onRemove() {
@@ -67,9 +87,8 @@ public class GameSurface extends BaseGameSurface {
             }
         });
         if (spawnTable == null)
-            spawnTable = new SpawnTable(this, 0, table.bottom + padding, this.getWidth(), 0);
+            spawnTable = new SpawnTable(this, table.left - padding, table.bottom + padding, table.right + padding, 0);
 
-//        spawnTable.updateSize(this.getWidth() / 2f - spawnTable.width() / 2f, spawnTable.top);
     }
 
     public void checkMaybeAdd() {
@@ -85,22 +104,29 @@ public class GameSurface extends BaseGameSurface {
     }
     @Override
     protected void update() {
+        if (scoreView != null) {
+            if (highScore <= score) highScore = score;
+            scoreView.update(score, this.highScore);
+        }
         if (spawnTable != null)
             spawnTable.update();
         if (table != null) {
             table.update();
         }
+
     }
 
     private void gameOver() {
         Log.d("GameOver", "gameOver: ");
-        Toast.makeText(this.getContext(), "Game Over", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this.getContext(), "Game Over", Toast.LENGTH_LONG).show();
+        GameSharePreference.getInstance().setInt(Const.HIGHEST_SCORE, this.highScore);
         isGameOver = true;
-        stopThread();
+        if (gameCallback != null) gameCallback.onOver(this.score);
     }
 
     @Override
     protected void gameDraw(Canvas canvas) {
+        if (scoreView != null) scoreView.draw(canvas);
         if (table != null) {
             table.draw(canvas);
         }
@@ -113,14 +139,20 @@ public class GameSurface extends BaseGameSurface {
     protected void onTouch(MotionEvent event) {
         super.onTouch(event);
         if (spawnTable != null) {
-//            spawnTable.getSpaceFirst().getShape().onTouch(event);
-//            spawnTable.getSpaceSecond().getShape().onTouch(event);
-//            spawnTable.getSpaceThird().getShape().onTouch(event);
             for (SpawnSpace spawnSpace : spawnTable.getSpawnSpaces()) {
                 spawnSpace.getShape().onTouch(event);
             }
         }
-        //if (shape.contains(event.getX(), event.getY()))
     }
 
+    public void clearAndReset() {
+        score = 0;
+        table.reset();
+        spawnTable.reset();
+        isGameOver = false;
+    }
+
+    public interface GameCallback {
+        void onOver(int score);
+    }
 }

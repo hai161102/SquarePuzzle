@@ -26,7 +26,7 @@ public class Square extends RectF {
         this.startLeft = this.left;
         this.startTop = this.top;
         init();
-        destroyAnimation = new DestroyAnimation(12, new BaseAnimation.AnimationActionListener() {
+        destroyAnimation = new DestroyAnimation(10, new BaseAnimation.AnimationActionListener() {
             @Override
             public void onStart() {
                 onStartAnimation();

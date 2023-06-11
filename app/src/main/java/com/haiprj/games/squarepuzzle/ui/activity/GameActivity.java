@@ -3,16 +3,16 @@ package com.haiprj.games.squarepuzzle.ui.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Surface;
-import android.view.SurfaceHolder;
 
 import androidx.annotation.NonNull;
 
 import com.haiprj.games.squarepuzzle.R;
 import com.haiprj.games.squarepuzzle.base.view.BaseActivity;
-import com.haiprj.games.squarepuzzle.base.view.BaseDialog;
 import com.haiprj.games.squarepuzzle.databinding.ActivityGameBinding;
 import com.haiprj.games.squarepuzzle.ui.dialog.GameOverDialog;
+import com.haiprj.games.squarepuzzle.ui.widget.GameSurface;
+
+import java.util.Objects;
 
 public class GameActivity extends BaseActivity<ActivityGameBinding> {
     private static final String CURRENT_SURFACE = "CURRENT_SURFACE";
@@ -24,9 +24,22 @@ public class GameActivity extends BaseActivity<ActivityGameBinding> {
     @Override
     protected void initView() {
         binding.gameSurface.setActivity(this);
-        GameOverDialog.getInstance(this, this, (key, objects) -> {
+        binding.gameSurface.gameCallback = new GameSurface.GameCallback() {
+            @Override
+            public void onOver(int score) {
+                GameOverDialog.getInstance(GameActivity.this, GameActivity.this, (key, objects) -> {
+                    if (Objects.equals(key, "exit")) {
+                        finish();
+                    }
+                    if (Objects.equals(key, "play_again")) {
+                        binding.gameSurface.clearAndReset();
+                    }
+                });
+                GameOverDialog.getInstance().setScore(score);
+                GameOverDialog.getInstance().show();
 
-        }).show();
+            }
+        };
     }
 
     @Override

@@ -112,6 +112,14 @@ public class Table extends RectF {
         );
     }
 
+    public void reset() {
+        for (int i = 0; i < Const.TAB_COL; i++) {
+            for (int j = 0; j < Const.TAB_ROW; j++) {
+                this.mapMatrix[i][j] = 0;
+            }
+        }
+        copyMapMatrix();
+    }
 
     public void draw(Canvas canvas) {
 

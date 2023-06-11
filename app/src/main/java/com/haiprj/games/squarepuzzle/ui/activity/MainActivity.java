@@ -18,7 +18,26 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @Override
     protected void addEvent() {
-        binding.startGame.setOnClickListener(v -> GameActivity.start(this));
+        binding.startGame.setOnClickListener(v -> {
+            v.setScaleX(0.8f);
+            v.setScaleY(0.8f);
+            GameActivity.start(this);
+        });
+        binding.quitGame.setOnClickListener(v -> {
+            v.setScaleX(0.8f);
+            v.setScaleY(0.8f);
+            finish();
+            System.exit(0);
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        binding.startGame.setScaleX(1);
+        binding.startGame.setScaleY(1);
+        binding.quitGame.setScaleX(1);
+        binding.quitGame.setScaleY(1);
     }
 
     @Override

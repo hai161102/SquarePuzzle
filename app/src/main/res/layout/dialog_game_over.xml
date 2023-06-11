@@ -55,8 +55,9 @@
                     android:text="@string/play_again"
                     android:textSize="@dimen/_12sdp"
                     android:fontFamily="@font/threedisometric_black_bwppg"
-                    android:textColor="#1418f0"
+                    android:textColor="#595CF6"
                     android:gravity="center"
+                    android:padding="@dimen/_8sdp"
                     android:id="@+id/playAgain"/>
                 <TextView
                     android:layout_width="0dp"
@@ -67,6 +68,7 @@
                     android:fontFamily="@font/threedisometric_black_bwppg"
                     android:textColor="#FFFF00"
                     android:gravity="center"
+                    android:padding="@dimen/_8sdp"
                     android:id="@+id/exit"/>
             </LinearLayout>
         </LinearLayout>

@@ -245,28 +245,10 @@ public abstract class BaseGameSurface extends SurfaceView implements SurfaceHold
         }
     }
 
-    protected void render(Canvas canvas) {
-        gameDraw(canvas);
-    }
 
     protected void updateAll() {
         ((Activity) getContext()).runOnUiThread(this::update);
     }
 
-    public void onPause() {
-        stopThread();
-        synchronized (this.surfaceHolder) {
-            isPause = true;
-        }
-    }
-
-    public void onResume() {
-        if (isPause) {
-            startThread();
-            synchronized (this.surfaceHolder){
-                isPause = false;
-            }
-        }
-    }
 
 }
